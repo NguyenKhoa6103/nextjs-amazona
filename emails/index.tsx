@@ -7,19 +7,25 @@ import AskReviewOrderItemsEmail from './ask-review-order-items'
 const resend = new Resend(process.env.RESEND_API_KEY as string)
 
 export const sendPurchaseReceipt = async ({ order }: { order: IOrder }) => {
+  const userEmail = (order.user as { email: string } | null)?.email
+  if (!userEmail) return
+  
   await resend.emails.send({
     from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
-    to: (order.user as { email: string }).email,
+    to: userEmail,
     subject: `Order Confirmation`,
     react: <PurchaseReceiptEmail order={order} />,
   })
 }
 
 export const sendAskReviewOrderItems = async ({ order }: { order: IOrder }) => {
+  const userEmail = (order.user as { email: string } | null)?.email
+  if (!userEmail) return
+  
   const oneDayFromNow = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString()
   await resend.emails.send({
     from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
-    to: (order.user as { email: string }).email,
+    to: userEmail,
     subject: 'Review your order items',
     react: <AskReviewOrderItemsEmail order={order} />,
     scheduledAt: oneDayFromNow,

@@ -27,7 +27,7 @@ export async function updateOrderToPaid(orderId: string) {
     await order.save()
     if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
       await updateProductStock(order._id)
-    if (order.user.email) await sendPurchaseReceipt({ order })
+    if (order.user?.email) await sendPurchaseReceipt({ order })
     revalidatePath(`/account/orders/${orderId}`)
     return { success: true, message: 'Order paid successfully' }
   } catch (err) {
@@ -79,7 +79,7 @@ export async function deliverOrder(orderId: string) {
     order.isDelivered = true
     order.deliveredAt = new Date()
     await order.save()
-    if (order.user.email) await sendAskReviewOrderItems({ order })
+    if (order.user?.email) await sendAskReviewOrderItems({ order })
     revalidatePath(`/account/orders/${orderId}`)
     return { success: true, message: 'Order delivered successfully' }
   } catch (err) {
